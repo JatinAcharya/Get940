@@ -120,14 +120,28 @@ desc employees;
 insert into employees values(207, 'John','Cena','JCENA','123.412.4567',sysdate, 'IT_PROG', 20000,null,200, 60);
 
 --38. Delete department 20.
-
-
+delete from departments where department_id = 20;
 
 --39. Change job ID of employee 110 to IT_PROG if the employee belongs to department 10 and the existing job ID does not start with IT.
-
+update employees set job_id = 'IT_PROG' where department_id = 10 and job_id not like 'IT%';
 
 --40. Insert a row into departments table with manager ID 120 and location ID in any location ID for city Tokyo.
+insert into departments values (280, 'MEDICAL', 120, 1200);
 
+--41. Display department name and number of employees in the department.
+select d.department_name, count(*) from employees e, departments d where e.department_id = d.department_id group by department_name;
+
+--42. Display job title, employee ID, number of days between ending date and starting date for all jobs in department 30 from job history.
+select  h.employee_id, j.job_title, h.end_date - h.start_date from jobs j, job_history h where j.job_id = h.job_id and h.department_id = 30;
+
+--43. Display department name and manager first name.
+select d.department_name, e.first_name from employees e, departments d where e.employee_id = d.manager_id;
+
+--44. Display department name, manager name, and city.
+select d.department_name, e.first_name, l.city from departments d, employees e, locations l where e.employee_id = d.manager_id and d.location_id = l.location_id;
+
+--45. Display country name, city, and department name.
+select c.country_name, l.city, d.department_name from departments d, locations l, countries c where d.location_id = l.location_id and l.country_id = c.country_id;
 
 
 
