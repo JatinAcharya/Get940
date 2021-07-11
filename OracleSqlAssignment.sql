@@ -143,8 +143,23 @@ select d.department_name, e.first_name, l.city from departments d, employees e, 
 --45. Display country name, city, and department name.
 select c.country_name, l.city, d.department_name from departments d, locations l, countries c where d.location_id = l.location_id and l.country_id = c.country_id;
 
+--46. Display job title, department name, employee last name, starting date for all jobs from 2000 to 2005.
+select j.job_title, d.department_name, e.last_name, h.start_date from jobs j, departments d, employees e, job_history h 
+where h.job_id = j.job_id and h.department_id = d.department_id and d.department_id = e.department_id 
+and to_char(start_date,'yyyy') between 2000 and 2005;
 
+--47. Display job title and average salary of employees
+select j.job_title, avg(salary) from employees e, jobs j where e.job_id = j.job_id group by j.job_title;
 
+--48. Display job title, employee name, and the difference between maximum salary for the job and salary of the employee.
+select j.job_title, e.first_name, j.max_salary-e.salary from employees e, jobs j where e.job_id = j.job_id;
+
+--49. Display last name, job title of employees who have commission percentage and belongs to department 30.
+select e.last_name, j.job_title from employees e, jobs j where e.job_id = j.job_id 
+and e.department_id = 30 and e.commission_pct is not null;
+
+--50. Display details of jobs that were done by any employee who is currently drawing more than 15000 of salary
+select h.* from job_history h, employees e where e.employee_id = h.employee_id and e.salary > 15000;
 
 
 
