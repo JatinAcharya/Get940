@@ -46,7 +46,7 @@ select * from employees where commission_pct = null and salary between 5000 and 
 select first_name, hire_date, last_day(hire_date)+1 from employees;
 
 --14. Display first name and experience of the employees.
-
+select first_name, hire_date, ((sysdate-hire_date)/365) from employees;
 
 --15. Display first name of employees who joined in 2001.
 select first_name,hire_date from employees where to_char(hire_date,'yyyy')= 2001;
@@ -161,10 +161,74 @@ and e.department_id = 30 and e.commission_pct is not null;
 --50. Display details of jobs that were done by any employee who is currently drawing more than 15000 of salary
 select h.* from job_history h, employees e where e.employee_id = h.employee_id and e.salary > 15000;
 
+--51. Display department name, manager name, and salary of the manager for all managers whose experience is more than 5 years.
+select d.department_name, e.first_name, salary from employees e, departments d where e.manager_id = d.manager_id and ((sysdate - e.hire_date)/365) > 5;
 
+--52. Display employee name if the employee joined before his manager.
+select e.first_name, e.last_name from employees e, employees m where e.manager_id = m.employee_id and e.hire_date < m.hire_date;
 
+--53. Display employee name, job title for the jobs employee did in the past where the job was done less than six months.
+select e.first_name, e.last_name, j.job_title from employees e, jobs j, job_history h where e.employee_id = h.employee_id
+and h.job_id = j.job_id and months_between(h.end_date,h.start_date)<6;
 
+--54. Display employee name and country in which he is working.
+select e.first_name, e.last_name, c.country_name from employees e, countries c, departments d, locations l 
+where e.department_id = d.department_id and d.location_id = l.location_id and l.country_id = c.country_id;
 
+--55. Display department name, average salary and number of employees with commission within the department.
+select d.department_name, round(avg(e.salary),2), count(e.commission_pct) from employees e, departments d 
+where e.department_id = d.department_id group by d.department_name;
+
+--56. Display details of departments managed by ‘Smith’.
+select * from departments where manager_id in (select employee_id from employees where first_name = 'Smith');
+
+--57. Display jobs into which employees joined in the current year.
+select * from jobs where job_id in (select job_id from employees where to_char(hire_date,'yyyy') = to_char(sysdate,'yyyy'));
+
+--58. Display employees who did not do any job in the past.
+select * from employees where employee_id not in (select employee_id from job_history);
+
+--59. Display job title and average salary for employees who did a job in the past.
+select j.job_title, avg(e.salary) from employees e, jobs j where e.job_id = j.job_id and e.employee_id in 
+(select employee_id from job_history) group by j.job_title;
+
+--60. Display country name, city, and number of departments where department has more than 5 employees.
+select c.country_name, l.city, count(d.department_id) from departments d, locations l, countries c where
+d.location_id = l.location_id and l.country_id = c.country_id
+and d.department_id in (select department_id from employees group by department_id having count(employee_id)>5)
+group by c.country_name, l.city;
+
+--61. Display details of manager who manages more than 5 employees.
+select * from employees where employee_id in (select manager_id from employees group by manager_id having count(employee_id)>5);
+
+--62. Display employee name, job title, start date, and end date of past jobs of all employees with commission percentage null.
+select e.first_name, e.last_name, j.job_title, h.start_date, h.end_date from employees e, jobs j, job_history h 
+where e.employee_id = h.employee_id and h.job_id = j.job_id and e.employee_id IN 
+(select employee_id from employees where commission_pct is null);
+
+--63. Display the departments into which no employee joined in last two years.
+select * from departments where department_id not in (select department_id from employees where FLOOR((SYSDATE-HIRE_DATE)/365) < 2);
+
+--64. Display the details of departments in which the max salary is greater than 10000 for employees who did a job in the past.
+select * from departments where department_id in(select department_id from employees where employee_id in
+(select employee_id from job_history) group by department_id having max(salary)>10000);
+
+--65. Display details of current job for employees who worked as IT Programmers in the past.
+select * from jobs where job_id in
+(select job_id from employees where employee_id in 
+(select employee_id from job_history where job_id = (select job_id from jobs where job_title = 'Programmer')));
+
+--66. Display the details of employees drawing the highest salary in the department.
+select first_name, department_id, salary from employees e where salary = 
+(select max(salary) from employees where department_id = e.department_id);
+
+--67. Display the city of employee whose employee ID is 105.
+select city from locations where location_id =
+(select location_id from departments where department_id = 
+(select department_id from employees where employee_id = 105));
+
+--68. Display third highest salary of all employees
+select salary from employees e where 2 = (select count(distinct salary) from employees where salary > e.salary);
 
 
 
